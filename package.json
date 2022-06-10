@@ -1,0 +1,24 @@
+{
+  "name": "project-manager-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1-VAN-1/project-manager-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1-VAN-1/project-manager-server/issues"
+  },
+  "homepage": "https://github.com/1-VAN-1/project-manager-server#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "^6.3.6",
+    "nodemon": "^2.0.16"
+  }
+}
