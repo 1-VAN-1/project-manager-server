@@ -28,6 +28,12 @@ routers.forEach((router) => {
 
 app.use(express.static(path.resolve(__dirname, "static")));
 
+app.get("/static/uploads/:filename", (req, res) => {
+  res.sendFile(
+    path.resolve(__dirname, "static", "uploads", req.params.filename)
+  );
+});
+
 app.use(
   history({
     index: path.resolve(__dirname, "static", "index.html"),
@@ -36,12 +42,6 @@ app.use(
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "static", "index.html"));
-});
-
-app.get("/static/uploads/:filename", (req, res) => {
-  res.sendFile(
-    path.resolve(__dirname, "static", "uploads", req.params.filename)
-  );
 });
 
 app.use(errorMiddleware);
