@@ -25,11 +25,13 @@ routers.forEach((router) => {
   app.use("/api", router);
 });
 
-// app.use(express.static(path.resolve(__dirname, "static")));
+app.use(express.static(path.resolve(__dirname, "static")));
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "static", "index.html"));
-// });
+app.get("/static/uploads/:filename", (req, res) => {
+  res.sendFile(
+    path.resolve(__dirname, "static", "uploads", req.params.filename)
+  );
+});
 
 app.use(errorMiddleware);
 

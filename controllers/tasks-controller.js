@@ -3,9 +3,9 @@ const service = require("../service/tasks-service");
 class TasksController {
   async createTask(req, res, next) {
     try {
-      await service.createTask(req.body);
+      const task = await service.createTask(req.fields, req.files);
 
-      return res.status(201).end();
+      return res.status(201).json({ task });
     } catch (error) {
       next(error);
     }

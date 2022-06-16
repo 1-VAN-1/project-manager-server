@@ -2,21 +2,24 @@ const ApiError = require("../exceptions/api-error");
 const TaskModel = require("../models/task-model");
 
 class TasksService {
-  async createTask({
-    title,
-    description,
-    difficulty,
-    donePercents,
-    attachmentLinks,
-    startTime,
-    deadline,
-  }) {
+  async createTask(
+    { title, description, difficulty, donePercents, startTime, deadline },
+    files
+  ) {
+    let attachments;
+
+    if (files.files.isArray) {
+      attachments = files.files.map((file) => file.name);
+    } else {
+      attachments = [files.files.name];
+    }
+
     const task = await TaskModel.create({
       title,
       description,
       difficulty,
       donePercents,
-      attachmentLinks,
+      attachments,
       startTime,
       deadline,
     });

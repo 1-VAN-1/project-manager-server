@@ -38,11 +38,11 @@ class UserController {
     }
   }
 
-  async getUsers(req, res, next) {
+  async getUser(req, res, next) {
     try {
-      const users = await service.getAllUsers();
+      const user = await service.getUser(req.params.id);
 
-      return res.json({ users });
+      return res.json({ user });
     } catch (error) {
       next(error);
     }
