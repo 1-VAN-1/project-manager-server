@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const errorMiddleware = require("./middleware/error-middleware");
 const path = require("path");
+const history = require("connect-history-api-fallback");
 
 const PORT = process.env.PORT || 5000;
 const DB_URL = process.env.DB_URL || "";
@@ -26,6 +27,16 @@ routers.forEach((router) => {
 });
 
 app.use(express.static(path.resolve(__dirname, "static")));
+
+app.use(
+  history({
+    index: path.resolve(__dirname, "static", "index.html"),
+  })
+);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "static", "index.html"));
+});
 
 app.get("/static/uploads/:filename", (req, res) => {
   res.sendFile(
