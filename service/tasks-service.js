@@ -6,12 +6,14 @@ class TasksService {
     { title, description, difficulty, donePercents, startTime, deadline },
     files
   ) {
-    let attachments;
+    let attachments = [];
 
     if (files.files.isArray) {
       attachments = files.files.map((file) => file.name);
     } else {
-      attachments = [files.files.name];
+      if (files.files) {
+        attachments = [files.files.name];
+      }
     }
 
     const task = await TaskModel.create({
