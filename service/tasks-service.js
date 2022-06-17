@@ -7,13 +7,13 @@ class TasksService {
     files
   ) {
     let attachments = [];
-
-    if (files.files.isArray) {
-      attachments = files.files.map((file) => file.name);
-    } else {
-      if (files.files) {
+    
+    if (files.files) {
+      if (files.files.isArray) {
+        attachments = files.files.map((file) => file.name);
+      } else {
         attachments = [files.files.name];
-      }
+      } 
     }
 
     const task = await TaskModel.create({
