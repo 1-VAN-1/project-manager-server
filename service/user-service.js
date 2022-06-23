@@ -37,6 +37,10 @@ class UserService {
       }
     }
 
+    if (role === "ADMIN") {
+      project = await ProjectModel.create({});
+    }
+
     const hashPassword = bcrypt.hashSync(password, 5);
     const userRole = new RoleModel({ value: role });
     const activationLink = v4();
@@ -53,7 +57,8 @@ class UserService {
     });
 
     if (role === "ADMIN") {
-      project = await ProjectModel.create({ director: user._id });
+      project.director = user._id;
+      await project.save();
     }
 
     await mailService.sendActivationMail(

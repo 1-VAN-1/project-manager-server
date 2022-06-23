@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 
 const ProjectSchema = new Schema({
-  director: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  director: { type: Schema.Types.ObjectId, ref: "User" },
   tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
   employees: [{ type: Schema.Types.ObjectId, ref: "Employee" }],
 });
