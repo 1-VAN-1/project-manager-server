@@ -31,10 +31,10 @@ class UserService {
 
     if (role === "USER" && inviteCode) {
       project = await ProjectModel.findById(inviteCode);
-    }
 
-    if (!project) {
-      throw ApiError.BadRequest(`Invite code ${inviteCode} doesn't exist`);
+      if (!project) {
+        throw ApiError.BadRequest(`Invite code ${inviteCode} doesn't exist`);
+      }
     }
 
     const hashPassword = bcrypt.hashSync(password, 5);
