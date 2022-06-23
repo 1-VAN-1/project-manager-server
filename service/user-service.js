@@ -1,5 +1,6 @@
 const UserModel = require("../models/user-model");
 const RoleModel = require("../models/role-model");
+const ProjectModel = require("../models/project-model");
 const bcrypt = require("bcryptjs");
 const { v4 } = require("uuid");
 const mailService = require("../service/mail-service");
@@ -9,7 +10,15 @@ const UserDto = require("../dtos/user-dto");
 const ApiError = require("../exceptions/api-error");
 
 class UserService {
-  async registration({ email, password, role, name, surname, skills }) {
+  async registration({
+    email,
+    password,
+    role,
+    name,
+    surname,
+    skills,
+    inviteCode,
+  }) {
     const candidate = await UserModel.findOne({ email });
 
     if (candidate) {
@@ -18,19 +27,34 @@ class UserService {
       );
     }
 
+    let project = null;
+
+    if (role === "USER" && inviteCode) {
+      project = await ProjectModel.findById(inviteCode);
+    }
+
+    if (!project) {
+      throw ApiError.BadRequest(`Invite code ${inviteCode} doesn't exist`);
+    }
+
     const hashPassword = bcrypt.hashSync(password, 5);
     const userRole = new RoleModel({ value: role });
     const activationLink = v4();
 
     const user = await UserModel.create({
-      email: email,
+      email,
       password: hashPassword,
-      name: name,
-      surname: surname,
+      name,
+      surname,
       roles: [userRole.value],
-      skills: skills,
-      activationLink: activationLink,
+      skills,
+      activationLink,
+      project,
     });
+
+    if (role === "ADMIN") {
+      project = await ProjectModel.create({ director: user._id });
+    }
 
     await mailService.sendActivationMail(
       email,
@@ -84,7 +108,7 @@ class UserService {
     await user.save();
 
     if (user.roles.includes("USER")) {
-      await employeesService.createEmployee(user._id);
+      await employeesService.createEmployee(user._id, user.project);
     }
   }
 

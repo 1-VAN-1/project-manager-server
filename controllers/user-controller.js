@@ -17,7 +17,10 @@ class UserController {
         httpOnly: true,
       });
 
-      return res.json(userData);
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (error) {
       next(error);
     }
@@ -32,7 +35,10 @@ class UserController {
         httpOnly: true,
       });
 
-      return res.json(userData);
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (error) {
       next(error);
     }
@@ -42,7 +48,15 @@ class UserController {
     try {
       const user = await service.getUser(req.params.id);
 
-      return res.json({ user });
+      const userInfo = {
+        email: user.email,
+        name: user.name,
+        surname: user.surname,
+        skills: user.skills,
+        project: user.project,
+      };
+
+      return res.json({ user: userInfo });
     } catch (error) {
       next(error);
     }
@@ -83,7 +97,10 @@ class UserController {
         httpOnly: true,
       });
 
-      return res.json(userData);
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (error) {
       next(error);
     }

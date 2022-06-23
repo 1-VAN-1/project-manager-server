@@ -1,9 +1,12 @@
 const service = require("../service/employees-service");
 const EmployeeDto = require("../dtos/employee-dto");
 
-const convertToDto = async (employeeModel) => {
+const convertToDto = async (employeeId) => {
   const UserModel = require("../models/user-model");
   const TaskModel = require("../models/task-model");
+  const EmployeeModel = require("../models/employee-model");
+
+  const employeeModel = await EmployeeModel.findById(employeeId);
 
   const user = await UserModel.findById(employeeModel.user);
   if (!user) {
@@ -22,7 +25,8 @@ const convertToDto = async (employeeModel) => {
     user.name,
     user.surname,
     user.skills,
-    tasks
+    tasks,
+    employeeModel.user
   );
 };
 
@@ -41,7 +45,7 @@ class EmployeesController {
 
   async getEmployees(req, res, next) {
     try {
-      const employees = await service.getEmployees();
+      const employees = await service.getEmployees(req.user.project);
 
       const dto = [];
 

@@ -9,6 +9,7 @@ const UserSchema = new Schema({
   roles: [{ type: String, ref: "Role", required: true }],
   isActivated: { type: Boolean, default: false },
   activationLink: { type: String },
+  project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
 });
 
 module.exports = model("User", UserSchema);

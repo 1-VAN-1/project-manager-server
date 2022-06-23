@@ -1,17 +1,31 @@
 const ApiError = require("../exceptions/api-error");
 const TaskModel = require("../models/task-model");
+const TaskStateModel = require("../models/task-state-model");
+const ProjectModel = require("../models/project-model");
+const mongoose = require("mongoose");
+const fs = require("fs");
+const fileService = require("./file-service");
 
 class TasksService {
   async createTask(
+    projectId,
     { title, description, difficulty, donePercents, startTime, deadline },
     files
   ) {
-    let attachments;
+    let attachments = [];
 
-    if (files.files.isArray) {
-      attachments = files.files.map((file) => file.name);
-    } else {
-      attachments = [files.files.name];
+    if (files.files) {
+      if (Array.isArray(files.files)) {
+        attachments = files.files.map((file) => file.name);
+      } else {
+        attachments = [files.files.name];
+      }
+    }
+
+    const project = await ProjectModel.findById(projectId);
+
+    if (!project) {
+      throw ApiError.BadRequest("Invalid project id");
     }
 
     const task = await TaskModel.create({
@@ -24,27 +38,82 @@ class TasksService {
       deadline,
     });
 
+    project.tasks.push(task._id);
+    await project.save();
+
     return task;
   }
 
-  async putTask(taskId, { donePercents, isFree }) {
+  async putTask(
+    taskId,
+    {
+      donePercents,
+      isFree,
+      taskState,
+      title,
+      description,
+      difficulty,
+      deadline,
+      usedHours,
+    },
+    files
+  ) {
     let task = await TaskModel.findById(taskId);
 
     if (!task) {
       throw ApiError.BadRequest("Invalid task id");
     }
 
+    for (const index in task.attachments) {
+      fileService.deleteFileFromUploads(task.attachments[index]);
+    }
+
+    let attachments = [];
+
+    if (files.files) {
+      if (Array.isArray(files.files)) {
+        attachments = files.files.map((file) => file.name);
+      } else {
+        attachments = [files.files.name];
+      }
+    }
+
     task.donePercents = donePercents;
     task.isFree = isFree;
+    task.taskState = taskState;
+    task.attachments = attachments;
+    task.title = title;
+    task.description = description;
+    task.difficulty = difficulty;
+    task.deadline = deadline;
+    task.usedHours = usedHours;
 
     await task.save();
 
     return task;
   }
 
-  async getTasks() {
-    const tasks = await TaskModel.find();
-    return tasks;
+  async patchTask(taskId, { donePercents, state, isFree, usedHours }) {
+    let task = await TaskModel.findById(taskId);
+
+    if (!task) {
+      throw ApiError.BadRequest("Invalid task id");
+    }
+
+    task.donePercents = donePercents ?? task.donePercents;
+    task.isFree = isFree ?? task.isFree;
+    task.state = state ?? task.state;
+    task.usedHours = usedHours ?? task.usedHours;
+
+    await task.save();
+
+    return task;
+  }
+
+  async getTasks(projectId) {
+    const project = await ProjectModel.findById(projectId);
+
+    return project.tasks;
   }
 
   async getTask(taskId) {
@@ -73,6 +142,25 @@ class TasksService {
     }
 
     return tasks;
+  }
+
+  async deleteTask(taskId, projectId) {
+    const task = await TaskModel.findById(taskId);
+
+    for (const index in task.attachments) {
+      fileService.deleteFileFromUploads(task.attachments[index]);
+    }
+
+    await task.remove();
+
+    const project = await ProjectModel.findById(projectId);
+    if (!project) {
+      throw ApiError.BadRequest("Invalid project id");
+    }
+
+    project.tasks = project.tasks.filter((task) => task != taskId);
+
+    await project.save();
   }
 }
 

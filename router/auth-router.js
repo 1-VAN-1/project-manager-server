@@ -26,6 +26,6 @@ router.post("/logout", controller.logout);
 
 router.get("/activate/:link", controller.activate);
 router.get("/refresh", controller.refresh);
-router.get("/user/:id", [authMiddleware, idMiddleware], controller.getUser);
+router.get("/user/:id", authMiddleware, controller.getUser);
 
 module.exports = router;

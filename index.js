@@ -34,15 +34,15 @@ app.get("/static/uploads/:filename", (req, res) => {
   );
 });
 
-app.use(
-  history({
-    index: path.resolve(__dirname, "static", "index.html"),
-  })
-);
+// app.use(
+//   history({
+//     index: path.resolve(__dirname, "static", "index.html"),
+//   })
+// );
 
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "static", "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(__dirname, "static", "index.html"));
+// });
 
 app.use(errorMiddleware);
 

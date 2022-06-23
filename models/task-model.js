@@ -9,6 +9,8 @@ const TaskSchema = new Schema({
   startTime: { type: Date, default: Date.now },
   deadline: { type: Date, required: true },
   isFree: { type: Boolean, default: true },
+  state: { type: String, ref: "TaskState", default: "waiting" },
+  usedHours: { type: Number, default: 0 },
 });
 
 module.exports = model("Task", TaskSchema);
