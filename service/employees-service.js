@@ -1,23 +1,28 @@
 const EmployeeModel = require("../models/employee-model");
 const ProjectModel = require("../models/project-model");
+const UserModel = require("../models/user-model");
 const tasksService = require("./tasks-service");
 const ApiError = require("../exceptions/api-error");
 
 class EmployeesService {
-  async putToEmployee(employeeId, { takenTasks }) {
+  async putToEmployee(userId, employeeId, { takenTasks }) {
     const employee = await EmployeeModel.findById(employeeId);
 
     if (!employee) {
       throw ApiError.BadRequest("Invalid employee id");
     }
 
+    const user = await UserModel.findById(userId);
+
+    if (employee.user != userId && !user.roles.includes("ADMIN")) {
+      throw ApiError.PermissionDeniedError();
+    }
+
     let newTasks = await tasksService.updateTasks(takenTasks);
 
     const tasksIdOnly = newTasks.map((task) => task._id);
 
-    employee.takenTasks = tasksIdOnly;
-
-    await employee.save();
+    await employee.updateOne({ takenTasks: tasksIdOnly });
   }
 
   async getEmployees(projectId) {

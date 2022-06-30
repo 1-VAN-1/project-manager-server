@@ -9,7 +9,16 @@ const fileService = require("./file-service");
 class TasksService {
   async createTask(
     projectId,
-    { title, description, difficulty, donePercents, startTime, deadline },
+    {
+      title,
+      description,
+      difficulty,
+      donePercents,
+      startTime,
+      deadline,
+      state,
+      isFree,
+    },
     files
   ) {
     let attachments = [];
@@ -28,6 +37,16 @@ class TasksService {
       throw ApiError.BadRequest("Invalid project id");
     }
 
+    if (state) {
+      if (!(await TaskStateModel.findOne({ value: state }))) {
+        throw ApiError.BadRequest(`Task state "${state} isn't valid"`);
+      }
+    } else {
+      state = new TaskStateModel().value;
+    }
+
+    isFree = isFree === "true";
+
     const task = await TaskModel.create({
       title,
       description,
@@ -36,6 +55,8 @@ class TasksService {
       attachments,
       startTime,
       deadline,
+      state,
+      isFree,
     });
 
     project.tasks.push(task._id);
@@ -100,6 +121,12 @@ class TasksService {
       throw ApiError.BadRequest("Invalid task id");
     }
 
+    if (state) {
+      if (!(await TaskStateModel.findOne({ value: state }))) {
+        throw ApiError.BadRequest(`Task state "${state} isn't valid"`);
+      }
+    }
+
     task.donePercents = donePercents ?? task.donePercents;
     task.isFree = isFree ?? task.isFree;
     task.state = state ?? task.state;
@@ -134,9 +161,7 @@ class TasksService {
         continue;
       }
 
-      taskInDb.isFree = tasks[index].isFree;
-
-      await taskInDb.save();
+      await taskInDb.updateOne({ isFree: tasks[index].isFree });
 
       tasks[index] = taskInDb;
     }

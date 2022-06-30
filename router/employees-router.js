@@ -6,11 +6,7 @@ const idMiddleware = require("../middleware/id-middleware");
 
 const router = new Router();
 
-router.put(
-  "/employees/:id",
-  [authMiddleware, roleMiddleware(["ADMIN"])],
-  controller.putToEmployee
-);
+router.put("/employees/:id", [authMiddleware], controller.putToEmployee);
 
 router.get(
   "/employees",

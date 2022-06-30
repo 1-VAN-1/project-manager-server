@@ -35,7 +35,7 @@ class EmployeesController {
     try {
       const employeeId = req.params.id;
 
-      await service.putToEmployee(employeeId, req.body);
+      await service.putToEmployee(req.user.id, employeeId, req.body);
 
       return res.end();
     } catch (error) {

@@ -24,11 +24,7 @@ const fileMiddleware = formidableMiddleware(
   ]
 );
 
-router.post(
-  "/tasks",
-  [authMiddleware, roleMiddleware(["ADMIN"]), fileMiddleware],
-  controller.createTask
-);
+router.post("/tasks", [authMiddleware, fileMiddleware], controller.createTask);
 
 router.put("/tasks/:id", [authMiddleware, fileMiddleware], controller.putTask);
 router.patch("/tasks/:id", authMiddleware, controller.patchTask);
